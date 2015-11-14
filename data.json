@@ -1,0 +1,67 @@
+{  
+	"nodes":
+	[
+      {
+         "name": "1A01",
+         "group": 0,
+         "DisplayName": "I Definition 1",
+         "ShortText": "Definition: Cause of Itself",
+         "OutDegree": "3"
+      },
+      {
+         "name": "1P04",
+         "DisplayName": "I Definition 2",
+         "ShortText": "Definition: Finite in its kind",
+         "group": 1,
+         "OutDegree": "2"
+      },
+      {
+         "name": "1P11",
+         "DisplayName": "I Definition 3",
+         "ShortText": "Definition: Substance",
+         "group": 0,
+         "OutDegree": "10"
+      },
+      {
+         "name": "1P15",
+         "DisplayName": "I Definition 4",
+         "ShortText": "Definition: Attribute",
+         "group": 0,
+         "OutDegree": "6"
+      },
+      {
+         "name": "1P06C01",
+         "DisplayName": "I Definition 5",
+         "ShortText": "Definition: Mode",
+         "group": 0,
+         "OutDegree": "10"
+      }
+	
+  ],
+  "links":
+  [
+      {
+        "source": "1A01",
+        "target": "1P04"
+      ,"value": 1},
+      {
+        "source": "1A01",
+        "target": "1P06C01"
+      ,"value": 1},
+      {
+        "source": "1A01",
+        "target": "1P11"
+      ,"value": 1},
+      {
+        "source": "1A01",
+        "target": "1P11"
+      ,"value": 1},
+      {
+        "source": "1A01",
+        "target": "1P15"
+      ,"value": 1}
+  ] 
+  
+}    
+    
+
