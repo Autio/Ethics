@@ -244,12 +244,12 @@ labels.attr("x", function(d) { if(d.fix && d.tier_x) { return d.tier_x * tier_wi
 
 
 // ARROWS
-svg.append("defs").selectAll("marker")
+gnodes.append("defs").selectAll("marker")
     .data(["suit", "licensing", "resolved"])
   .enter().append("marker")
     .attr("id", function(d) { return d; })
     .attr("viewBox", "0 -5 10 10")
-    .attr("refX", 25)
+    .attr("refX", node_radius + 5)
     .attr("refY", 0)
     .attr("markerWidth", 6)
     .attr("markerHeight", 6)
