@@ -7,27 +7,13 @@ function sleep(milliseconds) {
   }
 }
 
-function wordwrap( str, width, brk, cut ) {
- 
-    brk = brk || 'n';
-    width = width || 75;
-    cut = cut || false;
- 
-    if (!str) { return str; }
- 
-    var regex = '.{1,' +width+ '}(\s|$)' + (cut ? '|.{' +width+ '}|.+$' : '|\S+?(\s|$)');
- 
-    return str.match( RegExp(regex, 'g') ).join( brk );
- 
-}
-
 var width = 1600,
-    height = 1800;
+    height = 1900;
+
+var chart_mode = 1;
 
 var node_radius = 37;
-
 //var color = d3.scale.category20b();
-
 var color = d3.scale.ordinal()
             .domain([1,2,3,4,5])
             .range(["#E4B04A","#B9E3EF", "#EFC5B9", "#EFE0B9" ]);
@@ -38,7 +24,7 @@ var force = d3.layout.force()
     .size([width, height]);
 	
 var tier_width = 90,
-    tier_height = 120;
+    tier_height = 125;
 
 // PINNING DOWN
 	var node_drag = d3.behavior.drag()
@@ -110,34 +96,20 @@ var explanation = d3.tip()
 .style("text-align", "left")
 .style("background", "rgba(200, 200, 200, 0.85)")
 .style("max-width", "500px")
-//.attr("x", 200)
-//.attr("y", 300)
 .html(function (d) {
 if (d.contents) {return "<span>" + d.DisplayName + "</span><br><br>" + "<span>" + d.contents + "</span>";} else {return;} });
 
 svg.call(tip);
 svg.call(explanation);
 
-// var explanation_box = d3.select("body")
-//   .append("div")
-//   .style("position", "absolute")
-//   .style("z-index", "10")
-//   .style("visibility", "hidden")
-//   .text("a simple tooltip");
 function show_things(d)
 {
-
- // tip.show(d);
   explanation.show(d);
- // explanation_box.style("visibility", "visible");
 }
 
 function hide_things(d)
 {
- 
-//  tip.hide(d);
   explanation.hide(d);
-//    explanation_box.style("visibility", "hidden");
 }
 
 graph.nodes.forEach(function(d) { nodeMap[d.name] = d; d.fix = true; }); // set all nodes to fixed at the start
@@ -212,6 +184,23 @@ var node = gnodes.append("circle")
     .on('mouseover', show_things)
     .on('mouseout', hide_things)
     .call(node_drag);
+
+d3.selection.prototype.dblTap = function (callback) {
+    var last = 0;
+    return this.each(function () {
+        d3.select(this).on("touchstart", function (e) {
+            if ((d3.event.timeStamp - last) < 500) {
+                console.log(this);
+                return callback(e);
+            }
+            last = d3.event.timeStamp;
+        });
+    });
+}
+
+d3.select("div").dblTap(function () {
+    alert("Double tap!");
+});
     //.on('dblclick', node_drag); //Added code
 
 //var titles = gnodes.append("title")
@@ -229,19 +218,39 @@ force.on("tick", function() {
 
 // Attach the lines
 // Do it based on tier data in the nodes
-link.attr("x1", function(d) { if(d.source.tier_x) { return d.source.tier_x * tier_width;} else {return d.source.x; }})
-    .attr("y1", function(d) { if(d.source.tier_y) { return d.source.tier_y * tier_height;} else {return d.source.y; }})
-    .attr("x2", function(d) { if(d.target.tier_x) { return d.target.tier_x * tier_width;} else {return d.target.x; }})
-    .attr("y2", function(d) { if(d.target.tier_y) { return d.target.tier_y * tier_height;} else {return d.target.y; }});
 
-// Set node position
-// Also based on data in the nodes
-node.attr("cx", function(d) { if(d.fix && d.tier_x) { return d.tier_x * tier_width;} else {return d.x; }})
-    .attr("cy", function(d) { if(d.fix && d.tier_y) { return d.tier_y * tier_height;} else {return d.y; }});
+if(chart_mode == 1)
+{
+    link.attr("x1", function(d) { if(d.source.tier_x) { return d.source.tier_x * tier_width;} else {return d.source.x; }})
+        .attr("y1", function(d) { if(d.source.tier_y) { return d.source.tier_y * tier_height;} else {return d.source.y; }})
+        .attr("x2", function(d) { if(d.target.tier_x) { return d.target.tier_x * tier_width;} else {return d.target.x; }})
+        .attr("y2", function(d) { if(d.target.tier_y) { return d.target.tier_y * tier_height;} else {return d.target.y; }});
 
-labels.attr("x", function(d) { if(d.fix && d.tier_x) { return d.tier_x * tier_width;} else {return d.x; }})
-      .attr("y", function(d) { if(d.fix && d.tier_y) { return d.tier_y * tier_height + 5;} else {return d.y + 5; }});
+    // Set node position
+    // Also based on data in the nodes
+    node.attr("cx", function(d) { if(d.fix && d.tier_x) { return d.tier_x * tier_width;} else {return d.x; }})
+        .attr("cy", function(d) { if(d.fix && d.tier_y) { return d.tier_y * tier_height;} else {return d.y; }});
 
+    labels.attr("x", function(d) { if(d.fix && d.tier_x) { return d.tier_x * tier_width;} else {return d.x; }})
+          .attr("y", function(d) { if(d.fix && d.tier_y) { return d.tier_y * tier_height + 5;} else {return d.y + 5; }});
+
+} else if (chart_mode == 2)
+{
+
+    link.attr("x1", function(d) { if(d.source.tier_x_2) { return d.source.tier_x_2 * tier_width;} else {return d.source.x; }})
+        .attr("y1", function(d) { if(d.source.tier_y_2) { return d.source.tier_y_2 * tier_height;} else {return d.source.y; }})
+        .attr("x2", function(d) { if(d.target.tier_x_2) { return d.target.tier_x_2 * tier_width;} else {return d.target.x; }})
+        .attr("y2", function(d) { if(d.target.tier_y_2) { return d.target.tier_y_2 * tier_height;} else {return d.target.y; }});
+
+    // Set node position
+    // Also based on data in the nodes
+    node.attr("cx", function(d) { if(d.fix && d.tier_x_2) { return d.tier_x_2 * tier_width;} else {return d.x; }})
+        .attr("cy", function(d) { if(d.fix && d.tier_y_2) { return d.tier_y_2 * tier_height;} else {return d.y; }});
+
+    labels.attr("x", function(d) { if(d.fix && d.tier_x_2) { return d.tier_x_2 * tier_width;} else {return d.x; }})
+          .attr("y", function(d) { if(d.fix && d.tier_y_2) { return d.tier_y_2 * tier_height + 5;} else {return d.y + 5; }});
+
+}
 
 // ARROWS
 gnodes.append("defs").selectAll("marker")
@@ -271,8 +280,10 @@ function getData() {
          "group": 1, 
          "InDegree": "0",
          "OutDegree": "3",
-         "tier_y": 1,
+         "tier_y": 0.5,
          "tier_x": 1,
+         "tier_y_2": 1,
+         "tier_x_2": 1,
          "contents": "I. By that which is self-caused, I mean that of which the essence involves existence, or that of which the nature is only conceivable as existent."
 
       },
@@ -282,8 +293,10 @@ function getData() {
          "ShortText": "Definition: Finite in its kind",
          "group": 1, "InDegree": "0",
          "OutDegree": "2",
-         "tier_y": 1,
+         "tier_y": 0.5,
          "tier_x": 2,
+         "tier_y_2": 1,
+         "tier_x_2": 2,
          "contents": "II. A thing is called finite after its kind, when it can be limited by another thing of the same nature; for instance, a body is called finite because we always conceive another greater body. So, also, a thought is limited by another thought, but a body is not limited by thought, nor a thought by body."
 
       },
@@ -293,8 +306,10 @@ function getData() {
          "ShortText": "Definition: Substance",
          "group": 1, "InDegree": "0",
          "OutDegree": "10",
-         "tier_y": 1,
+         "tier_y": 0.5,
          "tier_x": 3,
+         "tier_y_2": 1,
+         "tier_x_2": 3,
          "contents": "III. By substance, I mean that which is in itself, and is conceived through itself: in other words, that of which a conception can be formed independently of any other conception." 
       },
       {
@@ -303,8 +318,10 @@ function getData() {
          "ShortText": "Definition: Attribute",
          "group": 1, "InDegree": "0",
          "OutDegree": "6",
-         "tier_y": 1,
+         "tier_y": 0.5,
          "tier_x": 4,
+         "tier_y_2": 1,
+         "tier_x_2": 4,
          "contents": "IV. By attribute, I mean that which the intellect perceives as constituting the essence of substance."
 
       },
@@ -314,8 +331,10 @@ function getData() {
          "ShortText": "Definition: Mode",
          "group": 1, "InDegree": "0",
          "OutDegree": "10",
-         "tier_y": 1,
+         "tier_y": 0.5,
          "tier_x": 5,
+         "tier_y_2": 1,
+         "tier_x_2": 5,
          "contents": "V. By mode, I mean the modifications of substance, or that which exists in, and is conceived through, something other than itself."
 
       },
@@ -325,8 +344,10 @@ function getData() {
          "ShortText": "Definition: God",
          "group": 1, "InDegree": "0",
          "OutDegree": "11",
-         "tier_y": 1,
+         "tier_y": 0.5,
          "tier_x": 6,
+         "tier_y_2": 1,
+         "tier_x_2": 6,
          "contents": "VI. By God, I mean a being absolutely infinite--that is, a substance consisting in infinite attributes, of which each expresses eternal and infinite essentiality.   Explanation--I say absolutely infinite, not infinite after its kind: for, of a thing infinite only after its kind, infinite attributes may be denied; but that which is absolutely infinite, contains in its essence whatever expresses reality, and involves no negation."
 
       },
@@ -336,8 +357,10 @@ function getData() {
          "ShortText": "Definition: Free",
          "group": 1, "InDegree": "0",
          "OutDegree": "3",
-         "tier_y": 1,
+         "tier_y": 0.5,
          "tier_x": 7,
+         "tier_y_2": 1,
+         "tier_x_2": 7,
          "contents": "VII. That thing is called free, which exists solely by the necessity of its own nature, and of which the action is determined by itself alone. On the other hand, that thing is necessary, or rather constrained, which is determined by something external to itself to a fixed and definite method of existence or action."       },
       {
          "name": "1D08",
@@ -345,8 +368,10 @@ function getData() {
          "ShortText": "Definition: Eternity",
          "group": 1, "InDegree": "0",
          "OutDegree": "5",
-         "tier_y": 1,
-         "tier_x": 7,
+         "tier_y": 0.5,
+         "tier_x": 8,
+         "tier_y_2": 1,
+         "tier_x_2": 8,
          "contents": "VIII. By eternity, I mean existence itself, in so far as it is conceived necessarily to follow solely from the definition of that which is eternal.   Explanation--Existence of this kind is conceived as an eternal truth, like the essence of a thing, and, therefore, cannot be explained by means of continuance or time, though continuance may be conceived without a beginning or end."
 
       },
@@ -357,7 +382,7 @@ function getData() {
          "group": 0, "InDegree": "0",
          "OutDegree": "8",
          "tier_y": 1,
-         "tier_x": 10,
+         "tier_x": 1.5,
          "contents": "I. Everything which exists, exists either in itself or in something else."
       },
       {
@@ -367,7 +392,7 @@ function getData() {
          "group": 0, "InDegree": "0",
          "OutDegree": "11",
          "tier_y": 1,
-         "tier_x": 11,
+         "tier_x": 2.5,
          "contents": "II. That which cannot be conceived through anything else must be conceived through itself."
       },
       {
@@ -377,7 +402,7 @@ function getData() {
          "group": 0, "InDegree": "0",
          "OutDegree": "2",
          "tier_y": 1,
-         "tier_x": 12,
+         "tier_x": 3.5,
          "contents":"III. From a given definite cause an effect necessarily follows; and, on the other hand, if no definite cause be granted, it is impossible that an effect can follow."
          },
       {
@@ -387,7 +412,7 @@ function getData() {
          "group": 0, "InDegree": "0",
          "OutDegree": "9",
          "tier_y": 1,
-         "tier_x": 13,
+         "tier_x": 4.5,
          "contents":"IV. The knowledge of an effect depends on and involves the knowledge of a cause."
       },
       {
@@ -397,7 +422,7 @@ function getData() {
          "group": 0, "InDegree": "0",
          "OutDegree": "1",
          "tier_y": 1,
-         "tier_x": 14,
+         "tier_x": 5.5,
          "contents": "V. Things which have nothing in common cannot be understood, the one by means of the other; the conception of one does not involve the conception of the other."
       },
       {
@@ -407,7 +432,7 @@ function getData() {
          "group": 0, "InDegree": "0",
          "OutDegree": "6",
          "tier_y": 1,
-         "tier_x": 15,
+         "tier_x": 6.5,
          "contents": "VI. A true idea must correspond with its ideate or object."
       },
       {
@@ -417,7 +442,7 @@ function getData() {
          "group": 0, "InDegree": "0",
          "OutDegree": "1",
          "tier_y": 1,
-         "tier_x": 16,
+         "tier_x": 7.5,
          "contents": "VII. If a thing can be conceived as non-existing, its essence does not involve existence."
       },
       {
