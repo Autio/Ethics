@@ -14,6 +14,14 @@ Click a node or choose a passage from the selector. The reading pane scrolls to 
 
 Selections have shareable fragment identifiers, such as `#1P14` for Proposition XIV and `#1P14C02` for its second corollary. On narrow screens the reader sits below the map. Reduced-motion preferences are respected.
 
+## Personal highlights
+
+Select a passage and choose **Highlight passage**. Highlights appear in the reader and as gold outlines in the map. Choose **Remove highlight** to remove the selected passage’s highlight.
+
+Highlights are saved in this browser’s local storage, separately from the shared text and graph. Storage is specific to the website origin and browser profile: localhost and the live site have separate collections. Clearing site data removes them. If storage is unavailable, the page explains that a download is needed to preserve the collection.
+
+**Download highlights** exports a versioned JSON file with passage IDs and creation timestamps. **Import highlights** validates this format and merges it into the current collection, preserving existing highlights. Use export/import to transfer between browsers or keep a backup. No highlights are sent to a server. Highlighting applies to whole passages, rather than selected words.
+
 ## Run locally
 
 No build step, package installation, external JavaScript library, or account is required. Serve the repository with a static HTTP server:
