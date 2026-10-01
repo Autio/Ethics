@@ -2,3 +2,5 @@
 #map svg.focus-map{width:100%;height:auto;min-width:550px}
 
 .personal-tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px}.personal-tools button,.import-label{font-size:11px}.import-label{border:1px solid #bec8be;border-radius:6px;background:white;padding:8px;cursor:pointer}.import-label input{max-width:170px;font-size:10px}#storage-status{font-size:11px;color:var(--muted)}#reader .personal-highlight{background:#fff0b8;box-shadow:0 0 0 8px #fff0b8}#reader .current.personal-highlight{background:#fff0b8;box-shadow:0 0 0 10px #e0bc56}.node.saved circle{stroke:#a27a13;stroke-width:4}.node.saved.selected circle{stroke:var(--accent)}
+
+#map{position:relative}.hover-info{position:fixed;z-index:5;margin:0;padding:12px 16px;border:1px solid #b9caba;border-radius:8px;background:#f0f5ec;color:#26372f;font-size:13px;line-height:1.5;box-shadow:0 3px 12px #26372f12;pointer-events:none}.hover-info[hidden]{display:none}.node.dim,.edge{transition:opacity .12s,stroke .12s}@media(prefers-reduced-motion:reduce){.node.dim,.edge{transition:none}}

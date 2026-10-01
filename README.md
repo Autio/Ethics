@@ -10,7 +10,7 @@ An interactive reading companion for Spinoza’s geometric method: definitions a
 - **Book order** arranges definitions, axioms, propositions, and corollaries in reading order. Use it to relate the map to the progression of the book.
 - **Local dependencies** places a selected statement between its immediate premises and the statements that use it. Use it to understand one argument without the whole graph competing for attention.
 
-Click a node or choose a passage from the selector. The reading pane scrolls to the matching passage and highlights it. The map highlights immediate connections, while **Uses** and **Used by** provide clickable paths through the argument. Each reading section has a **Locate in the map** button. Nodes also work with Tab and Enter or Space.
+Hover over a node to preview its description and highlight its immediate premises and consequences. Keyboard focus provides the same preview. Moving away restores the selected statement’s connections without moving the reader. Click a node or choose a passage from the selector. The reading pane scrolls to the matching passage and highlights it. The map highlights immediate connections, while **Uses** and **Used by** provide clickable paths through the argument. Each reading section has a **Locate in the map** button. Nodes also work with Tab and Enter or Space.
 
 Selections have shareable fragment identifiers, such as `#1P14` for Proposition XIV and `#1P14C02` for its second corollary. On narrow screens the reader sits below the map. Reduced-motion preferences are respected.
 
