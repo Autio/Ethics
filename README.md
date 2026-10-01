@@ -61,3 +61,7 @@ Before submitting interface changes, check all three views, proposition and coro
 ## Licence
 
 The application retains the repository’s [GNU GPL version 2 licence](LICENSE). The underlying historical translation is public domain; the retained Project Gutenberg source carries its own distribution notice. Dependency-data attribution to R. F. Tredwell is preserved.
+
+## Line of argument
+
+Choose **Line of argument** in the view selector to read the selected statement’s complete chain of recorded premises as numbered text steps. Dependencies appear before the statements that use them; shared premises appear once. Each step includes its source statement and immediate premise references. Click a step to select it and read its full proof in the reading pane. This view expands the editorial dependency dataset; it does not claim to reconstruct a unique or formally verified proof.

@@ -3,7 +3,7 @@
 const $ = id => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';
 const svgEl = (tag, attrs, parent) => {const el=document.createElementNS(NS,tag);for(const [k,v] of Object.entries(attrs))el.setAttribute(k,v);parent?.append(el);return el;};
-let graph, selected=null;
+let graph, readingSections, selected=null;
 const storageKey='spinoza-ethics-highlights-v1';
 let highlights={};
 let storageAvailable=true;
@@ -26,7 +26,7 @@ function select(id, scroll=true){
  if(target && scroll){const reader=$('reader');reader.scrollTo({top:target.getBoundingClientRect().top-reader.getBoundingClientRect().top+reader.scrollTop-24,behavior:'instant'});}
 }
 function draw(){
- const mode=$('view').value, incoming=graph.links.filter(l=>l.target===selected), outgoing=graph.links.filter(l=>l.source===selected);
+ const mode=$('view').value; if(mode==='argument'){drawArgument();return;} const incoming=graph.links.filter(l=>l.target===selected), outgoing=graph.links.filter(l=>l.source===selected);
  const neighbors=new Set([selected,...incoming.map(l=>l.source),...outgoing.map(l=>l.target)]);
  const nodes=mode==='focus'&&selected?graph.nodes.filter(n=>neighbors.has(n.name)):graph.nodes;
  const ids=new Set(nodes.map(n=>n.name)),links=graph.links.filter(l=>ids.has(l.source)&&ids.has(l.target));
@@ -50,7 +50,26 @@ function draw(){
  for(const n of nodes){const [x,y]=positions.get(n.name),g=svgEl('g',{transform:`translate(${x},${y})`,class:'node'+(highlights[n.name]?' saved':'')+(n.name===selected?' selected':selected&&!neighbors.has(n.name)?' dim':''),role:'button',tabindex:0,'aria-label':n.DisplayName+': '+n.ShortText,'aria-pressed':String(n.name===selected)},svg);svgEl('circle',{r:mode==='layers'?Math.max(10,Math.min(20,(height-60)/32)):23,fill:colors[kind(n)]},g);svgEl('text',{dy:4},g).textContent=short(n);svgEl('title',{},g).textContent=n.DisplayName+' — '+n.ShortText;g.dataset.id=n.name;g.addEventListener('mouseenter',()=>previewNode(n.name));g.addEventListener('mouseleave',()=>previewNode(null));g.addEventListener('focus',()=>previewNode(n.name));g.addEventListener('blur',()=>previewNode(null));g.addEventListener('click',()=>select(n.name));g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(n.name);}});}
  const panel=$('selection');panel.replaceChildren();if(selected){const n=graph.nodes.find(n=>n.name===selected),heading=document.createElement('strong');heading.textContent=n.DisplayName;panel.append(heading);for(const [label,items]of [['Uses',incoming.map(l=>l.source)],['Used by',outgoing.map(l=>l.target)]]){if(!items.length)continue;const row=document.createElement('div');row.textContent=label+': ';for(const id of items){const b=document.createElement('button');b.textContent=short(graph.nodes.find(n=>n.name===id));b.onclick=()=>select(id);row.append(b);}panel.append(row);}}else panel.textContent='Choose a node to inspect its premises and read the full passage.';
 }
-async function init(){try{const responses=await Promise.all(['graph','text'].map(name=>fetch(`data/${name}.json`)));if(responses.some(r=>!r.ok))throw Error('Data unavailable');const [g,text]=await Promise.all(responses.map(r=>r.json()));graph=g;graph.nodes.sort((a,b)=>(a.name.includes('D')?0:a.name.includes('A')?1:2)-(b.name.includes('D')?0:b.name.includes('A')?1:2)||a.name.localeCompare(b.name));
+
+function drawArgument(){
+ const map=$('map');map.replaceChildren();document.querySelectorAll('.hover-info').forEach(el=>el.remove());
+ const container=document.createElement('div');container.className='argument-text';map.append(container);
+ const heading=document.createElement('h3');heading.textContent='Line of argument';container.append(heading);
+ const intro=document.createElement('p');intro.textContent='Recorded premises, in dependency order, leading to the selected statement. This expands the dependency map; it is not a new proof.';container.append(intro);
+ if(!selected){intro.textContent='Choose a passage to trace its argument.';return;}
+ const ordered=[],visited=new Set(),active=new Set();let cycle=false;
+ function visit(id){if(active.has(id)){cycle=true;return;}if(visited.has(id))return;active.add(id);for(const edge of graph.links.filter(l=>l.target===id))visit(edge.source);active.delete(id);visited.add(id);ordered.push(id);}
+ visit(selected);
+ const list=document.createElement('ol');container.append(list);
+ for(const id of ordered){const n=graph.nodes.find(n=>n.name===id);const item=document.createElement('li');if(id===selected)item.className='argument-conclusion';const title=document.createElement('button');title.textContent=n.DisplayName+(id===selected?' · Selected statement':'');title.onclick=()=>select(id);item.append(title);
+ const section=readingSections.find(s=>s.id===id);let passage=section?.paragraphs[0];if(!section){for(const s of readingSections){const anchor=Object.entries(s.anchors||{}).find(([i,a])=>a===id);if(anchor){passage=s.paragraphs[Number(anchor[0])];break;}}}
+ const text=document.createElement('p');text.textContent=passage||n.ShortText;item.append(text);
+ const parents=graph.links.filter(l=>l.target===id).map(l=>l.source);const note=document.createElement('small');note.textContent=parents.length?'Uses: '+parents.map(pid=>short(graph.nodes.find(n=>n.name===pid))).join(', '):'No earlier premises recorded in this map.';item.append(note);list.append(item);}
+ if(cycle){const note=document.createElement('p');note.textContent='A dependency cycle was encountered; each statement is shown once.';container.append(note);}
+ $('selection').textContent=graph.nodes.find(n=>n.name===selected).DisplayName+' · '+ordered.length+' steps including the selected statement';
+}
+
+async function init(){try{const responses=await Promise.all(['graph','text'].map(name=>fetch(`data/${name}.json`)));if(responses.some(r=>!r.ok))throw Error('Data unavailable');const [g,text]=await Promise.all(responses.map(r=>r.json()));graph=g;readingSections=text;graph.nodes.sort((a,b)=>(a.name.includes('D')?0:a.name.includes('A')?1:2)-(b.name.includes('D')?0:b.name.includes('A')?1:2)||a.name.localeCompare(b.name));
  const reader=$('reader');reader.replaceChildren();for(const s of text){const section=document.createElement('section');section.id=s.id;const n=graph.nodes.find(n=>n.name===s.id),h=document.createElement('h3');h.textContent=n?n.DisplayName.replace(/^I /,''): 'Appendix';section.append(h);if(n){const b=document.createElement('button');b.textContent='Locate in the map ↗';b.onclick=()=>select(s.id,false);section.append(b);}s.paragraphs.forEach((text,i)=>{const p=document.createElement('p');p.textContent=text;if(s.anchors?.[i])p.id=s.anchors[i];section.append(p);});reader.append(section);}
  for(const n of graph.nodes){const option=document.createElement('option');option.value=n.name;option.textContent=n.DisplayName;$('passage').append(option);}
  $('highlight').onclick=()=>{if(!selected)return;if(highlights[selected])delete highlights[selected];else highlights[selected]={createdAt:new Date().toISOString()};persistHighlights();draw();applyHighlights();};
