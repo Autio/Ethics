@@ -1,4 +1,4 @@
-# Spinoza’s Ethics — an argument atlas
+# A Map of Spinoza’s Ethics
 
 Explore how the claims in **Part I: Concerning God** depend on one another, with the complete Part I text alongside the map. Select a proposition to move directly to its statement, proof, and notes; select a corollary to jump to that exact paragraph.
 
