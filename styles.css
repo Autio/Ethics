@@ -14,3 +14,6 @@ header{padding:12px 24px}h1{font-size:30px;margin:0}.map-panel{gap:8px}.legend{m
 
 /* Reserve a caption outside the map, keeping all node hit targets unobstructed. */
 .hover-info{position:static;z-index:auto;margin:0;padding:0 2px;min-height:19px;border:0;border-radius:0;background:transparent;box-shadow:none;font-size:12px;line-height:19px;visibility:hidden;pointer-events:none}.hover-info.visible{visibility:visible}header{padding:8px 20px}h1{font-size:27px}.map-panel{gap:5px}.controls label{gap:3px}.controls select,.controls button{padding:6px 8px}footer{padding:5px 20px}#selection:empty{display:none}@media(min-width:851px){.map-panel{padding:10px 14px}#map{min-height:380px;flex-basis:380px}}
+
+/* Give the full argument more breathing room; the page can extend below the fold. */
+@media(min-width:851px){body{height:calc(100dvh + 160px)}#map{min-height:540px;flex-basis:540px}}@media(max-width:850px){#map{height:640px}.map-panel{min-height:800px}}
